@@ -1,83 +1,86 @@
-# Guía de Despliegue
-## 1. Requisitos Previos
-Antes de comenzar, asegúrate de tener instalados los siguientes componentes en tu sistema:
+# Deployment Guide
+## 1. Prerequisites
+Before starting, make sure you have the following components installed on your system:
 
-- Docker: Para contenerizar la base de datos.
-- Docker Compose: Para gestionar los servicios definidos en docker-compose.yml.
-- Git: Sistema de control de versiones.
+- Docker: To containerize the database.
+- Docker Compose: To manage services defined in docker-compose.yml.
+- Git: Version control system.
 
-## 2. Configuración Local
+## 2. Local Setup
 
-### Clonar el Repositorio
+### Clone the Repository
 
 ```bash
-git clone https://github.com/cfernandom/sistema-recargas-viajes-db.git
-cd sistema-recargas-viajes-db
+git clone https://github.com/FreddyB200/travel-recharge-database.git
+cd travel-recharge-database
 ```
 
-### Configurar Variables de Entorno
+### Configure Environment Variables
 
-Crea un archivo .env en la raíz del proyecto con las siguientes variables (ajusta los valores según sea necesario):
+Create a .env file in the project root with the following variables (adjust values as needed):
 
 ```ini
-POSTGRES_DB=sistema_recargas_viajes
+POSTGRES_DB=travel-recharge-database
 POSTGRES_USER=admin
 POSTGRES_PASSWORD=admin123
 POSTGRES_LISTEN_PORT=5432
+
 ```
 
-### Levantar los Servicios con Docker Compose
+### Start Services with Docker Compose
 
-Ejecuta el siguiente comando para iniciar el contenedor de PostgreSQL:
+Run the following command to start the PostgreSQL container:
+
 
 ```bash
 docker-compose up -d
 ```
 
-Esto creará un contenedor con PostgreSQL configurado según las variables de entorno.
+This will create a PostgreSQL container configured according to the environment variables.
 
-### Verificar el estado del contenedor
+### Verify Container Status
 
-Asegúrate de que el contenedor esté corriendo correctamente:
+Make sure the container is running properly:
 
 ```bash
 docker ps
 ```
 
-Deberías ver un contenedor llamado `db` en ejecución.
+You should see a container named `db` running.
 
-## 3. Acceder a la base de datos
+## 3. Accessing the Database
 
-Puedes conectarte a la base de datos usando herramientas como `psql` o un cliente gráfico como **pgAdmin**. A continuación se describe el procedimiento para acceder a la base de datos utilizando `psql` dentro del contenedor:
+You can connect to the database using tools like `psql` or graphical clients such as pgAdmin. Below are instructions to access the database using `psql` inside the container:
 
-### Acceder a la base de datos con psql dentro del contenedor
+### Access Database with psql Inside the Container
 
-1. **Obtener el nombre o ID del contenedor**  
-   Si no recuerdas el nombre del contenedor, puedes listar los contenedores en ejecución con el siguiente comando:
+1. **Get the Container Name or ID**  
+   If you don’t remember the container name, list running containers with:
 
    ```bash
    docker ps
    ```
 
-   Busca el contenedor con el nombre db.
+   Look for the container named `db`.
 
-2. **Abrir una terminal dentro del contenedor**
-    Usa el siguiente comando para acceder al contenedor:
+
+2. **Open a Terminal Inside the Container**
+    Use this command to enter the container:
    
     ```bash
     docker exec -it db bash
     ```
 
-3. **Conectarte a la base de datos con psql**
-    Una vez dentro del contenedor, ejecuta el siguiente comando para conectarte a la base de datos:
+3. **Connect to the Database with psql**
+    Once inside the container, run:
 
     ```bash
     psql -U ${POSTGRES_USER} -d ${POSTGRES_DB}
     ```
 
-4. **Salir del contenedor**
-    Cuando termines de trabajar con la base de datos, puedes salir del contenedor escribiendo:
-    
+4. **Exit the Container**
+    When done, exit the container shell with:
+       
     ```
     exit
     ```
