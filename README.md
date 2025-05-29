@@ -1,9 +1,10 @@
-# Sistema de Recargas y Viajes de Transporte Público
-Este proyecto contiene el diseño e implementación de una base de datos para el Módulo de Créditos y Viajes de un sistema de transporte público. El sistema permite la gestión de recargas de tarjetas y el seguimiento de viajes para los usuarios del sistema de transporte masivo. El objetivo de esta base de datos es mejorar la experiencia de los usuarios al ofrecer un sistema más eficiente para registrar y monitorear sus transacciones y viajes.
+# Public Transport Recharge and Travel System
 
-**Nota:** Este proyecto es un ejercicio académico y ha sido creado con el fin de practicar conceptos de diseño de bases de datos y no refleja la infraestructura real de un sistema de transporte.
+This project contains the design and implementation of a relational database for the Credits and Travel Module of a public transport system. The system enables the management of card recharges and tracking of travel activities for users of the mass transportation network. The primary objective is to improve the user experience by offering an efficient system to log and monitor transactions and travel history.
 
-## Diagrama relacional
+> **Note:** This project is an academic exercise developed to practice database design concepts and does not reflect the actual infrastructure of a public transport system.
+
+## Relational Diagram
 
 ```mermaid
 erDiagram
@@ -41,7 +42,8 @@ erDiagram
         float longitud
         int localidad_id FK
     }
-        TARIFAS {
+
+    TARIFAS {
         int tarifa_id PK
         float valor
         date fecha
@@ -83,8 +85,6 @@ erDiagram
         int tarjeta_id FK
     }
 
-
-
     USUARIOS ||--o{ TARJETAS : ""
     TARJETAS ||--o{ RECARGAS : ""
     PUNTOS_RECARGA ||--o{ RECARGAS : ""
@@ -94,52 +94,51 @@ erDiagram
     TARJETAS ||--o{ VIAJES : ""
     TARIFAS ||--o{ VIAJES : ""
     ESTACIONES ||--|{ RUTAS : ""
-	  ESTACIONES ||--|{ RUTAS : ""
+    ESTACIONES ||--|{ RUTAS : ""
     RUTAS ||--o{ ESTACIONES_INTERMEDIAS : ""
     ESTACIONES ||--o{ ESTACIONES_INTERMEDIAS : ""
 ```
 
-## Descripción del Proyecto
+## Project Description
 
-### Contexto
+### Context
 
-Una empresa de transporte público de la ciudad de Bogotá ha decidido modernizar su sistema de recarga de tarjetas y seguimiento de viajes. Este módulo permitirá:
+A public transportation company in Bogotá is looking to modernize its card recharge and travel tracking system. This module enables:
 
-- Registro de usuarios y sus tarjetas de transporte.
-- Gestión de puntos de recarga.
-- Registro de recargas de saldo en las tarjetas.
-- Registro y seguimiento de estaciones, rutas y viajes.
+- User registration and card management.
+- Management of authorized recharge points.
+- Logging of card balance top-ups.
+- Monitoring of stations, routes, and trips.
 
-El sistema garantiza la trazabilidad de las recargas y de los viajes realizados por cada usuario, manteniendo un historial preciso de cada transacción y permitiendo consultas y auditorías.
+The system ensures traceability of recharges and user trips, maintaining a precise history of each transaction to allow queries and audits.
 
-### Funcionalidades Principales
+### Core Features
 
-**Usuarios:**
+**Users:**
 
-- Registro de usuarios y tarjetas.
-- Gestión del saldo disponible en cada tarjeta.
+- User and card registration.
+- Management of card balances.
 
-**Puntos Autorizados de Recarga:**
+**Authorized Recharge Points:**
 
-- Registro de puntos de recarga, incluyendo su ubicación geográfica (latitud, longitud) y localidad.
+- Registration of recharge points with geographic data (latitude, longitude) and locality.
 
-**Recargas:**
+**Recharges:**
 
-- Registro de cada recarga con fecha, monto y ubicación del punto de recarga.
-- Historial de tarifas para asegurar consultas precisas en cualquier momento.
+- Each recharge is logged with date, amount, and location.
+- Historical tariffs allow accurate queries based on date.
 
-**Estaciones y Rutas:**
+**Stations and Routes:**
 
-- Registro de estaciones con su ubicación geográfica.
-- Definición de rutas, incluyendo estaciones de origen, destino e intermedias.
+- Station registration with geographic data.
+- Route definition with origin, destination, and intermediate stations.
 
-**Viajes:**
+**Trips:**
 
-- Registro de cada viaje realizado por los usuarios, incluyendo la estación de abordaje y el cálculo automático del saldo restante.
+- Logs each trip, including boarding station and automatic balance deduction.
 
-# Generador de Datos falsos
-El siguiente Notebook genera datos falsos para el diagrama propuesto. Actualmente los datos generados pueden tener inconsistencias, sientase libre de usar y modificar el notebook para generar sus propios datos. 
-https://colab.research.google.com/drive/1P0vnmkWPp9hxLaNTr7Ads2Osryb3bWIV?usp=sharing
+## Fake Data Generator
 
-# Contribuciones
-Este proyecto está abierto a contribuciones. Si encuentras errores o tienes sugerencias para mejorar el sistema, por favor abre un issue o envía un pull request.
+The following notebook generates synthetic data for the schema. Data may include inconsistencies. Feel free to modify and adapt the notebook for your own datasets:
+
+[Google Colab Notebook](https://colab.research.google.com/drive/1P0vnmkWPp9hxLaNTr7Ads2Osryb3bWIV?usp=sharing)
