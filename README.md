@@ -1,102 +1,94 @@
-# Public Transport Recharge and Travel System
-
-This project contains the design and implementation of a relational database for the Credits and Travel Module of a public transport system. The system enables the management of card recharges and tracking of travel activities for users of the mass transportation network. The primary objective is to improve the user experience by offering an efficient system to log and monitor transactions and travel history.
-
-> **Note:** This project is an academic exercise developed to practice database design concepts and does not reflect the actual infrastructure of a public transport system.
-
-## Relational Diagram
-
 ```mermaid
 erDiagram
-    USUARIOS {
-        int usuario_id PK
-        string nombre
-        string apellido
-        string numero_contacto
-        string correo_electronico
-        string genero
-        date fecha_nacimiento
-        string direccion_residencia
-        string numero_cedula
-        string ciudad_nacimiento
-        date fecha_registro
+    USERS {
+        int user_id PK
+        string first_name
+        string last_name
+        string contact_number
+        string email
+        string gender
+        date date_of_birth
+        string residential_address
+        string id_number
+        string city_of_birth
+        date registration_date
     }
 
-    LOCALIDADES {
-        int localidad_id PK
-        string nombre
+    LOCATIONS {
+        int location_id PK
+        string name
     }
 
-    TARJETAS {
-        int tarjeta_id PK
-        int usuario_id FK
-        date fecha_adquisicion
-        string estado
-        date fecha_actualizacion
+    CARDS {
+        int card_id PK
+        int user_id FK
+        date acquisition_date
+        string status
+        date update_date
     }
 
-    PUNTOS_RECARGA {
-        int punto_recarga_id PK
-        string direccion
-        float latitud
-        float longitud
-        int localidad_id FK
+    RECHARGE_POINTS {
+        int recharge_point_id PK
+        string address
+        float latitude
+        float longitude
+        int location_id FK
     }
 
-    TARIFAS {
-        int tarifa_id PK
-        float valor
-        date fecha
+    FARES {
+        int fare_id PK
+        float value
+        date date
     }
 
-    RECARGAS {
-        int recarga_id PK
-        date fecha
-        float monto
-        int punto_recarga_id FK
-        int tarjeta_id FK
+    RECHARGES {
+        int recharge_id PK
+        date date
+        float amount
+        int recharge_point_id FK
+        int card_id FK
     }
 
-    ESTACIONES {
-        int estacion_id PK
-        string nombre
-        string direccion
-        int localidad_id
-        float latitud
-        float longitud
+    STATIONS {
+        int station_id PK
+        string name
+        string address
+        int location_id
+        float latitude
+        float longitude
     }
 
-    RUTAS {
-        int ruta_id PK
-        int estacion_origen_id FK
-        int estacion_destino_id FK
+    ROUTES {
+        int route_id PK
+        int origin_station_id FK
+        int destination_station_id FK
     }
 
-    ESTACIONES_INTERMEDIAS {
-        int estacion_id PK "FK"
-        int ruta_id PK "FK"
+    INTERMEDIATE_STATIONS {
+        int station_id PK "FK"
+        int route_id PK "FK"
     }
 
-    VIAJES {
-        int viaje_id PK
-        int estacion_abordaje_id FK
-        date fecha
-        int tarifa_id FK
-        int tarjeta_id FK
+    TRIPS {
+        int trip_id PK
+        int boarding_station_id FK
+        date date
+        int fare_id FK
+        int card_id FK
     }
 
-    USUARIOS ||--o{ TARJETAS : ""
-    TARJETAS ||--o{ RECARGAS : ""
-    PUNTOS_RECARGA ||--o{ RECARGAS : ""
-    LOCALIDADES ||--o{ PUNTOS_RECARGA : ""
-    LOCALIDADES ||--o{ ESTACIONES : ""
-    ESTACIONES ||--o{ VIAJES : ""
-    TARJETAS ||--o{ VIAJES : ""
-    TARIFAS ||--o{ VIAJES : ""
-    ESTACIONES ||--|{ RUTAS : ""
-    ESTACIONES ||--|{ RUTAS : ""
-    RUTAS ||--o{ ESTACIONES_INTERMEDIAS : ""
-    ESTACIONES ||--o{ ESTACIONES_INTERMEDIAS : ""
+    USERS ||--o{ CARDS : ""
+    CARDS ||--o{ RECHARGES : ""
+    RECHARGE_POINTS ||--o{ RECHARGES : ""
+    LOCATIONS ||--o{ RECHARGE_POINTS : ""
+    LOCATIONS ||--o{ STATIONS : ""
+    STATIONS ||--o{ TRIPS : ""
+    CARDS ||--o{ TRIPS : ""
+    FARES ||--o{ TRIPS : ""
+    STATIONS ||--|{ ROUTES : ""
+    STATIONS ||--|{ ROUTES : ""
+    ROUTES ||--o{ INTERMEDIATE_STATIONS : ""
+    STATIONS ||--o{ INTERMEDIATE_STATIONS : ""
 ```
 
 ## Project Description
