@@ -135,6 +135,12 @@ The system ensures traceability of recharges and user trips, maintaining a preci
 
 For instructions on how to deploy this project, please refer to the [Deployment Guide](DEPLOYMENT.md).
 
+## API Repository
+
+The API for this database is available at the following repository:
+[Travel Recharge API](https://github.com/FreddyB200/travel-recharge-api)
+
+
 ## Credits
 
 This repository is a fork of the original project created by my database professor, [Cristian Fernando](https://github.com/cfernandom). The original repository served as the foundation for this project, and I have made improvements and modifications to adapt it to my needs.
