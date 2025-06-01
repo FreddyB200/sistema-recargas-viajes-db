@@ -29,16 +29,6 @@ erDiagram
         BOOLEAN operates_cable
     }
 
-    DEPOTS {
-        BIGINT depot_id PK
-        TEXT name UK
-        TEXT address
-        TEXT depot_type
-        INTEGER capacity_vehicles
-        BIGINT location_id FK
-        BIGINT concessionaire_id FK
-    }
-
     VEHICLES {
         BIGINT vehicle_id PK
         TEXT license_plate UK
@@ -81,8 +71,6 @@ erDiagram
         BIGINT route_id FK
         BIGINT station_id FK
         INTEGER sequence_order
-        %% UK(route_id, station_id)
-        %% UK(route_id, sequence_order)
     }
 
     CARDS {
@@ -177,7 +165,6 @@ erDiagram
         BIGINT final_destination_station_id FK
         INTEGER trip_count
         TEXT aggregation_period
-        %% PK(origin_station_id, final_destination_station_id, aggregation_period) %% Original PK from schema
     }
 
     DRIVERS {
@@ -192,6 +179,16 @@ erDiagram
         TEXT status
     }
 
+    DEPOTS {
+        BIGINT depot_id PK
+        TEXT name UK
+        TEXT address
+        TEXT depot_type
+        INTEGER capacity_vehicles
+        BIGINT location_id FK
+        BIGINT concessionaire_id FK
+    }
+
     USERS ||--o{ CARDS : "has"
     CARDS ||--o{ RECHARGES : "receives"
     RECHARGE_POINTS ||--o{ RECHARGES : "done_at"
@@ -199,24 +196,22 @@ erDiagram
     LOCATIONS ||--o{ STATIONS : "located_in"
     LOCATIONS ||--o{ DEPOTS : "located_in"
 
-    CONCESSIONAIRES ||--o{ VEHICLES : "owns/operates"
+    CONCESSIONAIRES ||--o{ VEHICLES : "owns"
     CONCESSIONAIRES ||--o{ ROUTES : "operates"
     CONCESSIONAIRES ||--o{ DRIVERS : "employs"
     CONCESSIONAIRES ||--o{ DEPOTS : "uses"
 
-
-    STATIONS ||--o{ ROUTES : "origin_for" (origin_station_id)
-    STATIONS ||--o{ ROUTES : "destination_for" (destination_station_id)
+    STATIONS ||--o{ ROUTES : "origin_for"
+    STATIONS ||--o{ ROUTES : "destination_for"
     STATIONS ||--o{ INTERMEDIATE_STATIONS : "is_part_of_route"
-    STATIONS ||--o{ TRIPS : "boarding_at" (boarding_station_id)
-    STATIONS ||--o{ TRIPS : "disembarking_at" (disembarking_station_id)
+    STATIONS ||--o{ TRIPS : "boarding_at"
+    STATIONS ||--o{ TRIPS : "disembarking_at"
     STATIONS ||--o{ REALTIME_ARRIVALS : "arrivals_for"
     STATIONS ||--o{ ALERTS : "alert_for_station"
-    STATIONS ||--o{ STATION_DESTINATIONS : "origin_for_destination_stats" (origin_station_id)
-    STATIONS ||--o{ STATION_DESTINATIONS : "final_destination_for_stats" (final_destination_station_id)
+    STATIONS ||--o{ STATION_DESTINATIONS : "origin_stats"
+    STATIONS ||--o{ STATION_DESTINATIONS : "final_stats"
 
-
-    ROUTES ||--o{ INTERMEDIATE_STATIONS : "has_sequence_of"
+    ROUTES ||--o{ INTERMEDIATE_STATIONS : "has_sequence"
     ROUTES ||--o{ TRIPS : "taken_on"
     ROUTES ||--o{ REALTIME_ARRIVALS : "arrivals_on"
     ROUTES ||--o{ ROUTE_CURRENT_LOCATION : "location_for"
@@ -225,12 +220,13 @@ erDiagram
     VEHICLES ||--o{ TRIPS : "used_for"
     VEHICLES ||--o{ REALTIME_ARRIVALS : "vehicle_arriving"
     VEHICLES ||--o{ ROUTE_CURRENT_LOCATION : "current_vehicle"
-    DEPOTS ||--o{ VEHICLES : "houses" (current_depot_id)
+    DEPOTS ||--o{ VEHICLES : "houses"
 
     DRIVERS ||--o{ TRIPS : "drives_for"
 
     CARDS ||--o{ TRIPS : "used_by"
     FARES ||--o{ TRIPS : "applies_to"
+
 ```
 
 ## Project Description
