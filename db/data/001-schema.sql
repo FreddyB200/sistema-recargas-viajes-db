@@ -1,5 +1,5 @@
 create table users (
-  user_id bigint primary key generated always as identity
+  user_id bigint primary key generated always as identity,
   first_name text,
   last_name text,
   contact_number text,
@@ -74,4 +74,37 @@ create table trips (
   date date,
   fare_id bigint references fares (fare_id),
   card_id bigint references cards (card_id)
+);
+
+create table realtime_arrivals (
+  arrival_id bigint primary key generated always as identity,
+  station_id bigint references stations (station_id),
+  arrival_time timestamp,
+  train_id text,
+  created_at timestamp default now()
+);
+
+create table route_current_location (
+  location_id bigint primary key generated always as identity,
+  route_id bigint references routes (route_id),
+  latitude double precision,
+  longitude double precision,
+  "timestamp" timestamp default now()
+);
+
+create table alerts (
+  alert_id bigint primary key generated always as identity,
+  message text,
+  severity text,
+  created_at timestamp default now()
+);
+
+alter table cards
+add column balance double precision default 0;
+
+create table station_destinations (
+  destination_id bigint primary key generated always as identity,
+  station_id bigint references stations (station_id),
+  destination_station_id bigint references stations (station_id),
+  trip_count int default 0
 );
