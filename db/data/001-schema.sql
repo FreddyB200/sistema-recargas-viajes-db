@@ -1,88 +1,77 @@
-CREATE TABLE USUARIOS (
-    usuario_id SERIAL PRIMARY KEY,
-    nombre VARCHAR(100),
-    apellido VARCHAR(100),
-    numero_celular VARCHAR(20),
-    fecha_nacimiento DATE,
-    direccion_residencia VARCHAR(255),
-    numero_cedula VARCHAR(50),
-    ciudad_nacimiento VARCHAR(100),
-    departamento_nacimiento VARCHAR(100),
-    fecha_registro DATE,
-    genero CHAR(1),
-    correo_electronico VARCHAR(100),
-    contraseña VARCHAR(100),
-    foto_perfil VARCHAR(500),
-    estado VARCHAR(50),
-    tipo varchar(50),
-    fecha_actualizacion VARCHAR(50),
-    acepta_terminos CHAR(1)
+create table users (
+  user_id bigint primary key generated always as identity
+  first_name text,
+  last_name text,
+  contact_number text,
+  email text,
+  gender text,
+  date_of_birth date,
+  residential_address text,
+  id_number text,
+  city_of_birth text,
+  registration_date date
 );
 
-CREATE TABLE TARJETAS (
-    tarjeta_id SERIAL PRIMARY KEY,
-    usuario_id INTEGER REFERENCES USUARIOS(usuario_id),
-    fecha_adquisicion DATE,
-    estado VARCHAR(50),
-    fecha_actualizacion DATE,
-    fecha_caducidad varchar(50),
-    tipo varchar(50)
-);
-CREATE TABLE LOCALIDADES (
-    localidad_id SERIAL PRIMARY KEY,
-    nombre VARCHAR(100)
+create table locations (
+  location_id bigint primary key generated always as identity,
+  name text
 );
 
-
-CREATE TABLE PUNTOS_RECARGA (
-    punto_recarga_id SERIAL PRIMARY KEY,
-    direccion VARCHAR(255),
-    latitud FLOAT,
-    longitud FLOAT,
-    localidad_id INTEGER REFERENCES LOCALIDADES(localidad_id)
+create table cards (
+  card_id bigint primary key generated always as identity,
+  user_id bigint references users (user_id),
+  acquisition_date date,
+  status text,
+  update_date date
 );
 
-CREATE TABLE TARIFAS (
-    tarifa_id SERIAL PRIMARY KEY,
-    valor FLOAT,
-    fecha DATE
+create table recharge_points (
+  recharge_point_id bigint primary key generated always as identity,
+  address text,
+  latitude double precision,
+  longitude double precision,
+  location_id bigint references locations (location_id)
 );
 
-CREATE TABLE RECARGAS (
-    recarga_id SERIAL PRIMARY KEY,
-    fecha DATE,
-    monto FLOAT,
-    punto_recarga_id INTEGER REFERENCES PUNTOS_RECARGA(punto_recarga_id),
-    tarjeta_id INTEGER REFERENCES TARJETAS(tarjeta_id)
+create table fares (
+  fare_id bigint primary key generated always as identity,
+  value double precision,
+  date date
 );
 
-CREATE TABLE ESTACIONES (
-    estacion_id SERIAL PRIMARY KEY,
-    nombre VARCHAR(100),
-    direccion VARCHAR(255),
-    localidad_id INTEGER REFERENCES LOCALIDADES(localidad_id),
-    latitud FLOAT,
-    longitud FLOAT
+create table recharges (
+  recharge_id bigint primary key generated always as identity,
+  date date,
+  amount double precision,
+  recharge_point_id bigint references recharge_points (recharge_point_id),
+  card_id bigint references cards (card_id)
 );
 
-CREATE TABLE RUTAS (
-    ruta_id SERIAL PRIMARY KEY,
-    estacion_origen_id INTEGER REFERENCES ESTACIONES(estacion_id),
-    estacion_destino_id INTEGER REFERENCES ESTACIONES(estacion_id)
+create table stations (
+  station_id bigint primary key generated always as identity,
+  name text,
+  address text,
+  location_id bigint references locations (location_id),
+  latitude double precision,
+  longitude double precision
 );
 
-CREATE TABLE ESTACIONES_INTERMEDIAS (
-    estacion_id INTEGER,
-    ruta_id INTEGER,
-    PRIMARY KEY (estacion_id, ruta_id),
-    FOREIGN KEY (estacion_id) REFERENCES ESTACIONES(estacion_id),
-    FOREIGN KEY (ruta_id) REFERENCES RUTAS(ruta_id)
+create table routes (
+  route_id bigint primary key generated always as identity,
+  origin_station_id bigint references stations (station_id),
+  destination_station_id bigint references stations (station_id)
 );
 
-CREATE TABLE VIAJES (
-    viaje_id SERIAL PRIMARY KEY,
-    estacion_abordaje_id INTEGER REFERENCES ESTACIONES(estacion_id),
-    fecha DATE,
-    tarifa_id INTEGER REFERENCES TARIFAS(tarifa_id),
-    tarjeta_id INTEGER REFERENCES TARJETAS(tarjeta_id)
+create table intermediate_stations (
+  station_id bigint references stations (station_id),
+  route_id bigint references routes (route_id),
+  primary key (station_id, route_id)
+);
+
+create table trips (
+  trip_id bigint primary key generated always as identity,
+  boarding_station_id bigint references stations (station_id),
+  date date,
+  fare_id bigint references fares (fare_id),
+  card_id bigint references cards (card_id)
 );
