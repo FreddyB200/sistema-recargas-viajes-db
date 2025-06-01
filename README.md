@@ -81,8 +81,8 @@ erDiagram
         BIGINT route_id FK
         BIGINT station_id FK
         INTEGER sequence_order
-        -- UK(route_id, station_id)
-        -- UK(route_id, sequence_order)
+        %% UK(route_id, station_id)
+        %% UK(route_id, sequence_order)
     }
 
     CARDS {
@@ -177,7 +177,7 @@ erDiagram
         BIGINT final_destination_station_id FK
         INTEGER trip_count
         TEXT aggregation_period
-        -- PK(origin_station_id, final_destination_station_id, aggregation_period) -- Original PK from schema
+        %% PK(origin_station_id, final_destination_station_id, aggregation_period) %% Original PK from schema
     }
 
     DRIVERS {
