@@ -1,3 +1,49 @@
+# Travel Recharge Database
+## TransMilenio Bogota - SITP Simulation
+
+## Project Description
+
+### Context
+
+This project provides a comprehensive simulation database for Bogotá's Integrated Public Transportation System (SITP), including TransMilenio. It aims to model various facets of the system to support the development, testing, and demonstration of related applications, such as a card recharge and travel tracking API, real-time information systems, and operational analytics.
+
+The database schema and generated data are designed to reflect the complexities of a large-scale public transit system, encompassing:
+- User and transit card management.
+- Detailed operational infrastructure: stations (portals, troncal, cable, zonal paraderos), routes, depots, and operating concessionaires.
+- Extensive vehicle fleet information with types and technologies.
+- Fare structures and card recharge mechanisms.
+- Logging of individual passenger trips, including multi-leg journeys with transfers.
+- Simulation of real-time data feeds like vehicle locations and station arrival predictions.
+- System alerts and aggregated ridership statistics (e.g., top destinations).
+
+The system ensures traceability of recharges and user trips, maintaining a precise history to allow for complex queries, performance testing, and audits. This project is based on publicly available information and statistics from TransMilenio S.A. to achieve a high degree of realism.
+
+### Core Features
+
+- **User Management:** Registration, profile data.
+- **Card Management:** Issuance, status tracking, balance updates, association with users.
+- **Fare System:** Definition of various fare types (standard, transfer) and their validity periods.
+- **Recharge System:** Logging of card recharges at various physical and online points.
+- **Infrastructure Modeling:**
+    - **Locations:** Operational zones within the city.
+    - **Stations:** Detailed information for all station types (Portals, Troncal, Cable, Zonal Paraderos), including geographic data and amenities like cycle parking.
+    - **Depots:** Vehicle storage and maintenance yards.
+    - **Concessionaires:** Registration of operating companies and their service capabilities (Troncal, Zonal, Cable).
+- **Operational Data:**
+    - **Vehicles:** Comprehensive fleet data including type, capacity, technology, model year, and assignment to concessionaires/depots.
+    - **Drivers:** Operator data including assignment to concessionaires.
+    - **Routes:** Definition of all route types (Troncal, Zonal UCE, Alimentadora, Cable) with origin, destination, operating concessionaire, and detailed intermediate station sequences.
+- **Trip Logging:** Recording of individual passenger journeys, including boarding/disembarking stations and times, vehicle, driver, route taken, fare applied, and handling of transfers with linked trip legs.
+- **Real-time Data Simulation:**
+    - **Arrival Predictions:** Snapshot data for `realtime_arrivals` at stations.
+    - **Vehicle Locations:** Snapshot data for `route_current_location`.
+    - *Note: For realistic load testing, these tables should ideally be updated dynamically by the application/simulation backend.*
+- **System Alerts:** Logging of service alerts (informational, warnings, critical) which can be system-wide or specific to routes/stations.
+- **Aggregated Statistics:** The `station_destinations` table is designed to hold pre-calculated top destinations from origin stations, derived from trip data.
+
+## Database Schema
+
+The database is designed to model the entities and relationships within the SITP.
 ```mermaid
 erDiagram
     USERS {
@@ -229,46 +275,38 @@ erDiagram
 
 ```
 
-## Project Description
+(Please note: Mermaid diagrams for very large schemas can sometimes be challenging to render perfectly or might require adjustments for optimal display in all Markdown viewers. The relationships are illustrative.)
 
-### Context
+# Data Generation
 
-A public transportation company in Bogotá is looking to modernize its card recharge and travel tracking system. This module enables:
+This project includes a sophisticated Python-based data generator designed to populate the database with a large volume of realistic, interconnected data, drawing insights from official TransMilenio statistics (specifically, "Estadísticas de oferta y demanda del Sistema Integrado de Transporte Público - SITP - Junio 2024").
 
-- User registration and card management.
-- Management of authorized recharge points.
-- Logging of card balance top-ups.
-- Monitoring of stations, routes, and trips.
----
-The system ensures traceability of recharges and user trips, maintaining a precise history of each transaction to allow queries and audits.
----
-### Core Features
----
-**Users:**
+### Process:
 
-- User and card registration.
-- Management of card balances.
+1. The data generator consists of a series of Python scripts (e.g., `1_insert_users.py`, `2_insert_cards.py`, etc., orchestrated by a main script or run individually). **These scripts are intended to be run locally by the developer/tester, not automatically by Docker during container startup.**
+2. These scripts generate individual `.sql` files containing `INSERT` statements for each table. These files are saved in the `db/data/generated_sql_scripts/ directory.` 
+3. The `station_destinations` table is populated differently: an SQL script named (for example) `16_populate_station_destinations.sql` is provided. This script, when executed by PostgreSQL, performs a direct aggregation on the `trips` table to calculate and insert the top destination data. This ensures data accuracy for this summary table.
 
---- 
+### Data Quantities and Realism:
+The generated data aims for a high degree of realism based on the referenced TransMilenio PDF. However, for practical local testing and development, the volume for certain high-transaction entities has been scaled down. The infrastructure and operational entities generally reflect real-world numbers.
 
-**Authorized Recharge Points:**
+Approximate record counts (can be adjusted in generator scripts):
 
-- Registration of recharge points with geographic data (latitude, longitude) and locality.
----
-**Recharges:**
+- **Users:** ~25,000 (Scaled down by a factor of 100 from a real-world estimate of ~2.5 million)
+- **Cards:** ~24,000, with ~20,000 active (Scaled down by 100)
+- **Trips (for one simulated week - June 3-9, 2024):** ~75,000 - 90,000 (Scaled down by 100)
+- **Stations:** ~7,765 (9 Portals, 4 Cable, 129 other Troncal, 7623 Zonal Paraderos - reflects real numbers)
+- **Routes:** ~558 (99 Troncal, 5 Dual, 347 Zonal UCE, 106 Alimentadora, 1 Cable - reflects real numbers)
+- **Vehicles:** 10,563 (reflects real numbers)
+- **Drivers:** ~24,446 (reflects real numbers)
+- **Recharge Points:** ~4,800 (reflects real numbers)
+- **Concessionaires:** 27 (reflects real numbers)
+- **Depots:** 58 (reflects real numbers)
+- **Recharges:** ~7-8 million (scaled down by a factor that makes sense relative to cards, or you can set a specific scaled number e.g. ~70,000-80,000)
+- **Other tables** (`locations`, `fares`, `realtime_arrivals`, `route_current_location`,` alerts`) are populated with a representative number of records suitable for testing.
 
-- Each recharge is logged with date, amount, and location.
-- Historical tariffs allow accurate queries based on date.
----
-**Stations and Routes:**
+The data simulates usage patterns such as daily transaction volumes, peak hour concentrations for trips, and transfer behaviors between different system components.
 
-- Station registration with geographic data.
-- Route definition with origin, destination, and intermediate stations.
----
-**Trips:**
-
-- Logs each trip, including boarding station and automatic balance deduction.
----
 ## Deployment Guide
 
 For instructions on how to deploy this project, please refer to the [Deployment Guide](DEPLOYMENT.md).
@@ -278,13 +316,10 @@ For instructions on how to deploy this project, please refer to the [Deployment 
 The API for this database is available at the following repository:
 [Travel Recharge API](https://github.com/FreddyB200/travel-recharge-api)
 
-
 ## Credits
 
-This repository is a fork of the original project created by my database professor, [Cristian Fernando](https://github.com/cfernandom). The original repository served as the foundation for this project, and I have made improvements and modifications to adapt it to my needs.
+This repository is a fork of the original project created by my database professor, [Cristian Fernando](https://github.com/cfernandom). The original repository served as the foundation for this project, and I have made improvements and modifications to adapt it to my needs and to incorporate a more detailed simulation based on TransMilenio's public data.
 
-## Fake Data Generator
+---
+*This project is an academic simulation and is not affiliated with, endorsed or approved by TransMilenio S.A. The data used is public and the project is for educational and testing purposes only.*
 
-The following notebook generates synthetic data for the schema. Data may include inconsistencies. Feel free to modify and adapt the notebook for your own datasets:
-
-[Google Colab Notebook](https://colab.research.google.com/drive/1P0vnmkWPp9hxLaNTr7Ads2Osryb3bWIV?usp=sharing)

@@ -1,86 +1,87 @@
 # Deployment Guide
-## 1. Prerequisites
-Before starting, make sure you have the following components installed on your system:
 
-- Docker: To containerize the database.
-- Docker Compose: To manage services defined in docker-compose.yml.
-- Git: Version control system.
+This guide covers two main use cases:
+1. **API/Database Users:** You want to quickly deploy the database (with pre-generated data) to use it as a backend for the API or for testing/analytics.
+2. **Data Experimenters:** You want to generate your own synthetic data, modify the schema, or experiment with the data generator (Python/Faker/Jupyter).
 
-## 2. Local Setup
+---
 
-### Clone the Repository
+## 1. Quick Start: Deploy the Database (Recommended for API Users)
 
+### Prerequisites
+- Docker
+- Docker Compose
+- Git
+
+If you do not have these tools, see the [Full Setup for Data Experimenters](#2-full-setup-for-data-experimenters) below for installation instructions.
+
+### a) Clone the Repository
 ```bash
 git clone https://github.com/FreddyB200/travel-recharge-database.git
 cd travel-recharge-database
 ```
 
-### Configure Environment Variables
-
-Create a .env file in the project root with the following variables (adjust values as needed):
-
+### b) Configure Environment Variables
+Create a `.env` file in the project root with the following content (edit as needed):
 ```ini
 POSTGRES_DB=travel-recharge-database
 POSTGRES_USER=admin
 POSTGRES_PASSWORD=admin123
 POSTGRES_LISTEN_PORT=5432
-
 ```
 
-### Start Services with Docker Compose
-
-Run the following command to start the PostgreSQL container:
-
-
+### c) Start the Database
 ```bash
 docker-compose up -d
 ```
+This will start a PostgreSQL container with the schema and pre-generated data.
 
-This will create a PostgreSQL container configured according to the environment variables.
-
-### Verify Container Status
-
-Make sure the container is running properly:
-
+### d) Access the Database (Optional)
+You can connect using `psql`, pgAdmin, or any PostgreSQL client. To access via terminal:
 ```bash
-docker ps
+docker exec -it db bash
+psql -U ${POSTGRES_USER} -d ${POSTGRES_DB}
 ```
 
-You should see a container named `db` running.
+---
 
-## 3. Accessing the Database
+## 2. Full Setup for Data Experimenters (Generate or Modify Data)
 
-You can connect to the database using tools like `psql` or graphical clients such as pgAdmin. Below are instructions to access the database using `psql` inside the container:
+If you want to generate your own data, modify the schema, or experiment with the data generator, follow these steps **after cloning the repository**:
 
-### Access Database with psql Inside the Container
+### a) Install Python 3.9+, pip, and venv
+```bash
+sudo apt update
+sudo apt install python3 python3-pip python3-venv
+```
 
-1. **Get the Container Name or ID**  
-   If you don’t remember the container name, list running containers with:
+### b) Create and Activate a Virtual Environment
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
 
-   ```bash
-   docker ps
-   ```
+### c) Install Python Dependencies
+```bash
+pip install --upgrade pip
+pip install jupyter faker pandas
+```
 
-   Look for the container named `db`.
+### d) Run the Data Generator Notebook
+Start Jupyter Notebook:
+```bash
+jupyter notebook
+```
+Open `db/data/data_generation.ipynb` in the Jupyter web interface and run the cells to generate new SQL scripts. You can modify the notebook to customize the generated data.
 
+- Generated SQL scripts will appear in `db/data/generated_sql_scripts/`.
+- You can then restart the database or reload the data as needed.
 
-2. **Open a Terminal Inside the Container**
-    Use this command to enter the container:
-   
-    ```bash
-    docker exec -it db bash
-    ```
+---
 
-3. **Connect to the Database with psql**
-    Once inside the container, run:
+## 3. Notes
+- If you only want to use the database with the API, you do **not** need to run the Python/Jupyter steps.
+- If you want to experiment with data, you can always regenerate the SQL scripts and reload the database.
+- If you have Docker permission issues, make sure your user is in the `docker` group and restart your session.
 
-    ```bash
-    psql -U ${POSTGRES_USER} -d ${POSTGRES_DB}
-    ```
-
-4. **Exit the Container**
-    When done, exit the container shell with:
-       
-    ```
-    exit
-    ```
+---
