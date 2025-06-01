@@ -1,94 +1,236 @@
 ```mermaid
 erDiagram
     USERS {
-        int user_id PK
-        string first_name
-        string last_name
-        string contact_number
-        string email
-        string gender
-        date date_of_birth
-        string residential_address
-        string id_number
-        string city_of_birth
-        date registration_date
+        BIGINT user_id PK
+        TEXT first_name
+        TEXT last_name
+        TEXT contact_number
+        TEXT email UK
+        TEXT gender
+        DATE date_of_birth
+        TEXT residential_address
+        TEXT id_number UK
+        TEXT city_of_birth
+        DATE registration_date
     }
 
     LOCATIONS {
-        int location_id PK
-        string name
+        BIGINT location_id PK
+        TEXT name UK
+        TEXT description
     }
 
-    CARDS {
-        int card_id PK
-        int user_id FK
-        date acquisition_date
-        string status
-        date update_date
+    CONCESSIONAIRES {
+        BIGINT concessionaire_id PK
+        TEXT name UK
+        BOOLEAN operates_troncal
+        BOOLEAN operates_zonal_uce
+        BOOLEAN operates_zonal_alimentacion
+        BOOLEAN operates_cable
     }
 
-    RECHARGE_POINTS {
-        int recharge_point_id PK
-        string address
-        float latitude
-        float longitude
-        int location_id FK
+    DEPOTS {
+        BIGINT depot_id PK
+        TEXT name UK
+        TEXT address
+        TEXT depot_type
+        INTEGER capacity_vehicles
+        BIGINT location_id FK
+        BIGINT concessionaire_id FK
     }
 
-    FARES {
-        int fare_id PK
-        float value
-        date date
-    }
-
-    RECHARGES {
-        int recharge_id PK
-        date date
-        float amount
-        int recharge_point_id FK
-        int card_id FK
+    VEHICLES {
+        BIGINT vehicle_id PK
+        TEXT license_plate UK
+        TEXT vehicle_type
+        INTEGER capacity
+        TEXT technology
+        INTEGER model_year
+        BIGINT concessionaire_id FK
+        TEXT status
+        BIGINT current_depot_id FK
     }
 
     STATIONS {
-        int station_id PK
-        string name
-        string address
-        int location_id
-        float latitude
-        float longitude
+        BIGINT station_id PK
+        TEXT name
+        TEXT station_code UK
+        TEXT station_type
+        TEXT address
+        BIGINT location_id FK
+        DOUBLE_PRECISION latitude
+        DOUBLE_PRECISION longitude
+        BOOLEAN has_cycle_parking
+        INTEGER cycle_parking_spots
+        BOOLEAN is_active
     }
 
     ROUTES {
-        int route_id PK
-        int origin_station_id FK
-        int destination_station_id FK
+        BIGINT route_id PK
+        TEXT route_code UK
+        TEXT route_name
+        TEXT route_type
+        BIGINT origin_station_id FK
+        BIGINT destination_station_id FK
+        BIGINT concessionaire_id FK
+        BOOLEAN is_active
     }
 
     INTERMEDIATE_STATIONS {
-        int station_id PK "FK"
-        int route_id PK "FK"
+        BIGINT intermediate_station_id PK
+        BIGINT route_id FK
+        BIGINT station_id FK
+        INTEGER sequence_order
+        -- UK(route_id, station_id)
+        -- UK(route_id, sequence_order)
+    }
+
+    CARDS {
+        BIGINT card_id PK
+        TEXT card_number UK
+        BIGINT user_id FK
+        DATE acquisition_date
+        TEXT status
+        DOUBLE_PRECISION balance
+        TIMESTAMP last_used_date
+        DATE update_date
+    }
+
+    RECHARGE_POINTS {
+        BIGINT recharge_point_id PK
+        TEXT name
+        TEXT address
+        DOUBLE_PRECISION latitude
+        DOUBLE_PRECISION longitude
+        BIGINT location_id FK
+        TEXT operator
+    }
+
+    FARES {
+        BIGINT fare_id PK
+        TEXT fare_type
+        DOUBLE_PRECISION value
+        DATE start_date
+        DATE end_date
+        TEXT description
+    }
+
+    RECHARGES {
+        BIGINT recharge_id PK
+        BIGINT card_id FK
+        BIGINT recharge_point_id FK
+        DOUBLE_PRECISION amount
+        TIMESTAMP recharge_timestamp
+        TEXT transaction_id UK
     }
 
     TRIPS {
-        int trip_id PK
-        int boarding_station_id FK
-        date date
-        int fare_id FK
-        int card_id FK
+        BIGINT trip_id PK
+        BIGINT card_id FK
+        BIGINT vehicle_id FK
+        BIGINT route_id FK
+        BIGINT driver_id FK
+        BIGINT boarding_station_id FK
+        BIGINT disembarking_station_id FK
+        TIMESTAMP boarding_time
+        TIMESTAMP disembarking_time
+        BIGINT fare_id FK
+        BOOLEAN is_transfer
+        TEXT transfer_group_id
     }
 
-    USERS ||--o{ CARDS : ""
-    CARDS ||--o{ RECHARGES : ""
-    RECHARGE_POINTS ||--o{ RECHARGES : ""
-    LOCATIONS ||--o{ RECHARGE_POINTS : ""
-    LOCATIONS ||--o{ STATIONS : ""
-    STATIONS ||--o{ TRIPS : ""
-    CARDS ||--o{ TRIPS : ""
-    FARES ||--o{ TRIPS : ""
-    STATIONS ||--|{ ROUTES : ""
-    STATIONS ||--|{ ROUTES : ""
-    ROUTES ||--o{ INTERMEDIATE_STATIONS : ""
-    STATIONS ||--o{ INTERMEDIATE_STATIONS : ""
+    REALTIME_ARRIVALS {
+        BIGINT arrival_id PK
+        BIGINT station_id FK
+        BIGINT route_id FK
+        BIGINT vehicle_id FK
+        TIMESTAMP estimated_arrival_time
+        TIMESTAMP actual_arrival_time
+        TEXT status
+        TIMESTAMP created_at
+    }
+
+    ROUTE_CURRENT_LOCATION {
+        BIGINT location_update_id PK
+        BIGINT route_id FK
+        BIGINT vehicle_id FK
+        DOUBLE_PRECISION latitude
+        DOUBLE_PRECISION longitude
+        DOUBLE_PRECISION speed
+        TIMESTAMP timestamp
+    }
+
+    ALERTS {
+        BIGINT alert_id PK
+        TEXT message
+        TEXT severity
+        TEXT alert_type
+        TIMESTAMP start_timestamp
+        TIMESTAMP end_timestamp
+        BIGINT station_id FK
+        BIGINT route_id FK
+    }
+
+    STATION_DESTINATIONS {
+        BIGINT destination_id PK
+        BIGINT origin_station_id FK
+        BIGINT final_destination_station_id FK
+        INTEGER trip_count
+        TEXT aggregation_period
+        -- PK(origin_station_id, final_destination_station_id, aggregation_period) -- Original PK from schema
+    }
+
+    DRIVERS {
+        BIGINT driver_id PK
+        TEXT employee_id UK
+        TEXT first_name
+        TEXT last_name
+        BIGINT concessionaire_id FK
+        DATE hire_date
+        TEXT license_number UK
+        TEXT license_expiry_date
+        TEXT status
+    }
+
+    USERS ||--o{ CARDS : "has"
+    CARDS ||--o{ RECHARGES : "receives"
+    RECHARGE_POINTS ||--o{ RECHARGES : "done_at"
+    LOCATIONS ||--o{ RECHARGE_POINTS : "located_in"
+    LOCATIONS ||--o{ STATIONS : "located_in"
+    LOCATIONS ||--o{ DEPOTS : "located_in"
+
+    CONCESSIONAIRES ||--o{ VEHICLES : "owns/operates"
+    CONCESSIONAIRES ||--o{ ROUTES : "operates"
+    CONCESSIONAIRES ||--o{ DRIVERS : "employs"
+    CONCESSIONAIRES ||--o{ DEPOTS : "uses"
+
+
+    STATIONS ||--o{ ROUTES : "origin_for" (origin_station_id)
+    STATIONS ||--o{ ROUTES : "destination_for" (destination_station_id)
+    STATIONS ||--o{ INTERMEDIATE_STATIONS : "is_part_of_route"
+    STATIONS ||--o{ TRIPS : "boarding_at" (boarding_station_id)
+    STATIONS ||--o{ TRIPS : "disembarking_at" (disembarking_station_id)
+    STATIONS ||--o{ REALTIME_ARRIVALS : "arrivals_for"
+    STATIONS ||--o{ ALERTS : "alert_for_station"
+    STATIONS ||--o{ STATION_DESTINATIONS : "origin_for_destination_stats" (origin_station_id)
+    STATIONS ||--o{ STATION_DESTINATIONS : "final_destination_for_stats" (final_destination_station_id)
+
+
+    ROUTES ||--o{ INTERMEDIATE_STATIONS : "has_sequence_of"
+    ROUTES ||--o{ TRIPS : "taken_on"
+    ROUTES ||--o{ REALTIME_ARRIVALS : "arrivals_on"
+    ROUTES ||--o{ ROUTE_CURRENT_LOCATION : "location_for"
+    ROUTES ||--o{ ALERTS : "alert_for_route"
+
+    VEHICLES ||--o{ TRIPS : "used_for"
+    VEHICLES ||--o{ REALTIME_ARRIVALS : "vehicle_arriving"
+    VEHICLES ||--o{ ROUTE_CURRENT_LOCATION : "current_vehicle"
+    DEPOTS ||--o{ VEHICLES : "houses" (current_depot_id)
+
+    DRIVERS ||--o{ TRIPS : "drives_for"
+
+    CARDS ||--o{ TRIPS : "used_by"
+    FARES ||--o{ TRIPS : "applies_to"
 ```
 
 ## Project Description
