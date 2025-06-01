@@ -1,0 +1,6 @@
+*
+!db/data/001-schema.sql
+!db/data/002-roles-privileges.sql
+!db/data/stored_procedures.sql
+!db/data/generated_sql_scripts/
+!db/data/generated_sql_scripts/**
