@@ -158,14 +158,14 @@ CREATE TABLE alerts (
   route_id BIGINT REFERENCES routes(route_id) -- If alert is route-specific
 );
 
-CREATE TABLE station_destinations ( -- For /stations/top-destinations endpoint
+CREATE TABLE station_destinations (
   destination_id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
   origin_station_id BIGINT NOT NULL REFERENCES stations(station_id),
-  final_destination_station_id BIGINT NOT NULL REFERENCES stations(station_id), -- The actual end station of a user's journey starting at origin
+  final_destination_station_id BIGINT NOT NULL REFERENCES stations(station_id),
   trip_count INTEGER DEFAULT 0,
-  aggregation_period TEXT NOT NULL, -- e.g., 'DAILY_2024-05-30', 'WEEKLY_2024-W22', 'MONTHLY_2024-05'
-  PRIMARY KEY (origin_station_id, final_destination_station_id, aggregation_period) -- Ensuring uniqueness for aggregation
-);
+  aggregation_period TEXT NOT NULL,
+  CONSTRAINT uq_station_destinations UNIQUE (origin_station_id, final_destination_station_id, aggregation_period) 
+); 
 
 -- Optional but recommended for realism
 CREATE TABLE drivers (
